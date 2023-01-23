@@ -1,8 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intune/widgets/home.dart';
 import 'package:intune/widgets/match.dart';
-import 'package:intune/widgets/settings.dart';
+import 'package:intune/widgets/settings/settings.dart';
 
 class Layout extends StatefulWidget {
   const Layout({super.key});
@@ -21,16 +20,6 @@ class _LayoutState extends State<Layout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Intune"),
-        backgroundColor: Colors.green,
-        actions: [
-          IconButton(
-            onPressed: FirebaseAuth.instance.signOut,
-            icon: const Icon(Icons.exit_to_app),
-          )
-        ],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (int index) {
@@ -53,9 +42,11 @@ class _LayoutState extends State<Layout> {
           ),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _pages,
+      body: SafeArea(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
       ),
     );
   }

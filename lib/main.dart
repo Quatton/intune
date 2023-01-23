@@ -8,6 +8,9 @@ import 'package:intune/auth.dart';
 import 'package:intune/layout.dart';
 import 'firebase_options.dart';
 
+//import google fonts
+import 'package:google_fonts/google_fonts.dart';
+
 Future main() async {
   await dotenv.load(fileName: ".env");
 
@@ -49,11 +52,23 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Intune',
-        theme: ThemeData.dark().copyWith(
-          cardColor: Colors.grey[800],
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)
-              .copyWith(secondary: Colors.white),
-        ),
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.dark(useMaterial3: true).copyWith(
+            brightness: Brightness.dark,
+            textTheme: GoogleFonts.montserratTextTheme(const TextTheme(
+              headline1: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              headline2: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+              headline3: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              bodyText1: TextStyle(fontSize: 18),
+            )),
+            // default button theme to be circular border
+            buttonTheme: const ButtonThemeData(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(30)),
+              ),
+            ),
+            cardColor: Colors.grey[800],
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)),
         // Check if logged in with Firebase Auth
         home: StreamBuilder<User?>(
             stream: FirebaseAuth.instance.authStateChanges(),
