@@ -116,14 +116,15 @@ class _AuthState extends State<Auth> {
     return GestureDetector(
       child: Scaffold(
         body: Container(
-          decoration: const BoxDecoration(
+          height: double.infinity,
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
                 // Spotify-themed sets of colors
-                Color(0xFF1DB954),
-                Color(0xFF191414),
+                Colors.green.shade500,
+                Colors.black,
               ],
             ),
           ),
@@ -131,6 +132,8 @@ class _AuthState extends State<Auth> {
             child: SingleChildScrollView(
               child: Center(
                 child: Column(
+                  // set mainAxisSize to screen size
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     // placeholder banner with logo and app title: Intune and a placeholder logo using the icon of music
                     SizedBox(
@@ -142,7 +145,7 @@ class _AuthState extends State<Auth> {
                           children: const [
                             Icon(
                               Icons.music_note,
-                              size: 50,
+                              size: 60,
                               color: Colors.white,
                             ),
                             SizedBox(height: 10),
@@ -167,7 +170,6 @@ class _AuthState extends State<Auth> {
                           child: ConstrainedBox(
                             constraints: const BoxConstraints(maxWidth: 400),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Visibility(
                                   visible: error.isNotEmpty,
@@ -194,52 +196,64 @@ class _AuthState extends State<Auth> {
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                if (mode != AuthMode.phone)
-                                  Column(
-                                    children: [
-                                      TextFormField(
-                                        controller: emailController,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Email',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        validator: (value) =>
-                                            value != null && value.isNotEmpty
-                                                ? null
-                                                : 'Required',
-                                      ),
-                                      const SizedBox(height: 20),
-                                      TextFormField(
-                                        controller: passwordController,
-                                        obscureText: true,
-                                        decoration: const InputDecoration(
-                                          hintText: 'Password',
-                                          border: OutlineInputBorder(),
-                                        ),
-                                        validator: (value) =>
-                                            value != null && value.isNotEmpty
-                                                ? null
-                                                : 'Required',
-                                      ),
-                                    ],
-                                  ),
-                                if (mode == AuthMode.phone)
-                                  TextFormField(
-                                    controller: phoneController,
-                                    decoration: const InputDecoration(
-                                      hintText: '+12345678910',
-                                      labelText: 'Phone number',
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    validator: (value) =>
-                                        value != null && value.isNotEmpty
-                                            ? null
-                                            : 'Required',
-                                  ),
+                                SizedBox(
+                                  height: 160,
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        if (mode != AuthMode.phone)
+                                          Column(
+                                            children: [
+                                              TextFormField(
+                                                controller: emailController,
+                                                decoration: const InputDecoration(
+                                                    hintText: 'Email',
+                                                    border:
+                                                        OutlineInputBorder()),
+                                                validator: (value) =>
+                                                    value != null &&
+                                                            value.isNotEmpty
+                                                        ? null
+                                                        : 'Required',
+                                              ),
+                                              const SizedBox(height: 20),
+                                              TextFormField(
+                                                controller: passwordController,
+                                                obscureText: true,
+                                                decoration:
+                                                    const InputDecoration(
+                                                  hintText: 'Password',
+                                                  border: OutlineInputBorder(),
+                                                ),
+                                                validator: (value) =>
+                                                    value != null &&
+                                                            value.isNotEmpty
+                                                        ? null
+                                                        : 'Required',
+                                              ),
+                                            ],
+                                          ),
+                                        if (mode == AuthMode.phone)
+                                          TextFormField(
+                                            controller: phoneController,
+                                            decoration: const InputDecoration(
+                                              hintText: '+12345678910',
+                                              labelText: 'Phone number',
+                                              border: OutlineInputBorder(),
+                                            ),
+                                            validator: (value) =>
+                                                value != null &&
+                                                        value.isNotEmpty
+                                                    ? null
+                                                    : 'Required',
+                                          ),
+                                      ]),
+                                ),
                                 const SizedBox(height: 20),
                                 SizedBox(
                                   width: double.infinity,
-                                  height: 50,
+                                  height: 60,
                                   child: ElevatedButton(
                                     onPressed: isLoading
                                         ? null
@@ -267,12 +281,12 @@ class _AuthState extends State<Auth> {
                                           child: isLoading
                                               ? Container(
                                                   color: Colors.grey[200],
-                                                  height: 50,
+                                                  height: 60,
                                                   width: double.infinity,
                                                 )
                                               : SizedBox(
                                                   width: double.infinity,
-                                                  height: 50,
+                                                  height: 60,
                                                   child: SignInButton(
                                                     button,
                                                     onPressed:
@@ -283,9 +297,10 @@ class _AuthState extends State<Auth> {
                                       ),
                                     )
                                     .toList(),
+                                const SizedBox(height: 20),
                                 SizedBox(
                                   width: double.infinity,
-                                  height: 50,
+                                  height: 60,
                                   child: OutlinedButton(
                                     onPressed: isLoading
                                         ? null
@@ -311,52 +326,44 @@ class _AuthState extends State<Auth> {
                                   ),
                                 ),
                                 const SizedBox(height: 20),
-                                if (mode != AuthMode.phone)
-                                  RichText(
-                                    text: TextSpan(
-                                      style:
-                                          Theme.of(context).textTheme.bodyText1,
-                                      children: [
-                                        TextSpan(
-                                          text: mode == AuthMode.login
-                                              ? "Don't have an account? "
-                                              : 'You have an account? ',
-                                        ),
-                                        TextSpan(
-                                          text: mode == AuthMode.login
-                                              ? 'Register now'
-                                              : 'Click to login',
-                                          style: const TextStyle(
-                                              color: Colors.blue),
-                                          recognizer: TapGestureRecognizer()
-                                            ..onTap = () {
-                                              setState(() {
-                                                mode = mode == AuthMode.login
-                                                    ? AuthMode.register
-                                                    : AuthMode.login;
-                                              });
-                                            },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                const SizedBox(height: 10),
-                                RichText(
-                                  text: TextSpan(
-                                    style:
-                                        Theme.of(context).textTheme.bodyText1,
-                                    children: [
-                                      const TextSpan(text: 'Or '),
-                                      TextSpan(
-                                        text: 'continue as guest',
-                                        style:
-                                            const TextStyle(color: Colors.blue),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = _anonymousAuth,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                SizedBox(
+                                    height: 60,
+                                    child: mode != AuthMode.phone
+                                        ? RichText(
+                                            text: TextSpan(
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .bodyText1,
+                                              children: [
+                                                TextSpan(
+                                                  text: mode == AuthMode.login
+                                                      ? "Don't have an account? "
+                                                      : 'You have an account? ',
+                                                ),
+                                                TextSpan(
+                                                  text: mode == AuthMode.login
+                                                      ? 'Register now'
+                                                      : 'Click to login',
+                                                  style: const TextStyle(
+                                                      color: Colors.blue),
+                                                  recognizer:
+                                                      TapGestureRecognizer()
+                                                        ..onTap = () {
+                                                          setState(() {
+                                                            mode = mode ==
+                                                                    AuthMode
+                                                                        .login
+                                                                ? AuthMode
+                                                                    .register
+                                                                : AuthMode
+                                                                    .login;
+                                                          });
+                                                        },
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : null),
                               ],
                             ),
                           ),
