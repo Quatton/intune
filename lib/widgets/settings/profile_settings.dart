@@ -1,5 +1,9 @@
+import 'package:auto_route/annotations.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intune/routes/router.gr.dart';
+import 'package:intune/widgets/splash.dart';
 
 final _auth = FirebaseAuth.instance;
 
@@ -51,6 +55,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                     ElevatedButton(
                         onPressed: () async {
                           await _auth.signOut();
+                          context.router.pushAndPopUntil(SplashRoute(),
+                              predicate: (route) => false);
                         },
                         child: const Text("Logout")),
                   ]),

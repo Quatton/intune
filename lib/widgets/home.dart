@@ -1,12 +1,58 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+import 'package:intune/widgets/friends.dart';
+import 'package:intune/widgets/match.dart';
+import 'package:intune/widgets/settings/settings.dart';
+
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
+  State<HomePage> createState() => _HomePageState();
 }
 
-// Use this 'https://i.scdn.co/image/${snapshot.data!.track!.imageUri.raw.split(':').last}' to get the album art
+class _HomePageState extends State<HomePage> {
+  int _currentIndex = 0;
+  final List<Widget> _pages = [
+    const FriendsPage(),
+    const MatchPage(),
+    const SettingsPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        items: const <BottomNavigationBarItem>[
+          // friends
+
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: "Friends",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: "Match",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: "Settings",
+          ),
+          // friends icon
+        ],
+      ),
+      body: SafeArea(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: _pages,
+        ),
+      ),
+    );
+  }
+}
