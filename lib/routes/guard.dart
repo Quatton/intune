@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
+import 'package:intune/services/spotify_auth_api.dart';
 
 class AuthGuard extends AutoRouteGuard {
   @override

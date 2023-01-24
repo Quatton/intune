@@ -63,14 +63,22 @@ class _ProfileSettingsState extends State<ProfileSettings> {
 
                           const SizedBox(height: 24),
                           // logout button
-                          ElevatedButton(
-                              onPressed: () async {
-                                await _auth.signOut();
-                                context.router.pushAndPopUntil(
-                                    const SplashRoute(),
-                                    predicate: (route) => false);
-                              },
-                              child: const Text("Logout"))
+                          if (snapshot.hasData)
+                            ElevatedButton(
+                                onPressed: () async {
+                                  await _auth.signOut();
+                                  context.router.pushAndPopUntil(
+                                      const SplashRoute(),
+                                      predicate: (route) => false);
+                                },
+                                child: const Text("Logout"))
+                          else
+                            ElevatedButton(
+                                onPressed: () async {
+                                  await SpotifyClient.getAccessToken();
+                                  setState(() {});
+                                },
+                                child: const Text("Tap to retry"))
                         ]),
                   );
                 })));

@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
+import 'package:intune/services/spotify_auth_api.dart';
 
 import 'common/banner.dart';
 
@@ -29,6 +30,10 @@ class _SplashPageState extends State<SplashPage> {
     _redirectCalled = true;
     final session = supabase.auth.currentSession;
     if (session != null) {
+      // if providerToken is null getAccessToken
+      if (session.providerToken == null) {
+        await SpotifyClient.getAccessToken();
+      }
       context.router.replace(const HomeRoute());
     }
   }
