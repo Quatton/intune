@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:intune/widgets/friends.dart';
 import 'package:intune/widgets/match.dart';
-import 'package:intune/widgets/settings/settings.dart';
+import 'package:intune/widgets/me/me.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +16,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const FriendsPage(),
     const MatchPage(),
-    const SettingsPage(),
+    const MePage(),
   ];
 
   @override

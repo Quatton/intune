@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
+import 'package:intune/services/spotify_auth_api.dart';
 import 'package:intune/widgets/common/banner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -127,6 +128,7 @@ class _LoginPageState extends State<LoginPage> {
     });
     try {
       await supabase.auth.signInWithOAuth(Provider.spotify,
+          scopes: SpotifyClient.scopes,
           redirectTo: !kIsWeb ? dotenv.get("SPOTIFY_REDIRECT_URI") : null);
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);

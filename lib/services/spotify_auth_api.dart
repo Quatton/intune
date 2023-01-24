@@ -2,15 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intune/constants/supabase.dart';
 import 'package:intune/util/logger.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
+
+final _auth = supabase.auth;
 
 class SpotifyClient {
   static final _clientId = dotenv.get("SPOTIFY_CLIENT_ID");
   static final _clientSecret = dotenv.get("SPOTIFY_CLIENT_SECRET");
   static final _redirectUrl = dotenv.get("SPOTIFY_REDIRECT_URI");
-  static final _scope = [
+  static final scopes = [
     'user-read-private',
     'user-read-email',
     'app-remote-control',
@@ -19,14 +22,12 @@ class SpotifyClient {
     'playlist-modify-public',
     'user-read-currently-playing',
   ].join(",");
-  static final _credentials = SpotifyApiCredentials(_clientId, _clientSecret);
 
-  static SpotifyApi spotify = SpotifyApi(_credentials);
+  static SpotifyApi get spotify =>
+      SpotifyApi.withAccessToken(_auth.currentSession!.providerToken!);
 
   static Future<void> connectToSpotifyRemote() async {
     final accessToken = await getAccessToken();
-    // Connect with Spotify Web API
-    SpotifyClient.spotify = SpotifyApi.withAccessToken(accessToken);
     await SpotifySdk.connectToSpotifyRemote(
         clientId: dotenv.get("SPOTIFY_CLIENT_ID"),
         redirectUrl: dotenv.get("SPOTIFY_REDIRECT_URI"),
@@ -36,7 +37,7 @@ class SpotifyClient {
   static Future<String> getAccessToken() async {
     try {
       var authenticationToken = await SpotifySdk.getAccessToken(
-          clientId: _clientId, redirectUrl: _redirectUrl, scope: _scope);
+          clientId: _clientId, redirectUrl: _redirectUrl, scope: scopes);
       Log.setStatus('Got a token: $authenticationToken');
       return authenticationToken;
     } on PlatformException catch (e) {
@@ -46,5 +47,12 @@ class SpotifyClient {
       Log.setStatus('not implemented');
       return Future.error('not implemented');
     }
+  }
+}
+
+extension SpotifyApiExtension on SpotifyApi {
+  Future<void> getMe() async {
+    final me = await this.me.get();
+    Log.setStatus('Got a user: ${me.displayName}');
   }
 }
