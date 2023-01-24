@@ -44,6 +44,7 @@ class _LoginPageState extends State<LoginPage> {
       final session = data.session;
       if (session != null) {
         _redirecting = true;
+        SpotifyClient.getAccessToken();
         AutoRouter.of(context).replace(const HomeRoute());
       }
     });

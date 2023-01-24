@@ -41,8 +41,8 @@ class _HomePageState extends State<HomePage> {
             label: "Match",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: "Settings",
+            icon: Icon(Icons.person),
+            label: "Me",
           ),
           // friends icon
         ],
