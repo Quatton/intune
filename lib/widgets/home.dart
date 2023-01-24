@@ -31,7 +31,6 @@ class _HomePageState extends State<HomePage> {
         },
         items: const <BottomNavigationBarItem>[
           // friends
-
           BottomNavigationBarItem(
             icon: Icon(Icons.people),
             label: "Friends",

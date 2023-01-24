@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -8,7 +6,6 @@ import 'package:intune/constants/supabase.dart';
 import 'package:intune/util/logger.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
-import 'package:oauth2/oauth2.dart' as oauth2;
 
 final _auth = supabase.auth;
 
