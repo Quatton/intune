@@ -10,20 +10,22 @@ class MatchPage extends StatefulWidget {
 }
 
 class _MatchPageState extends State<MatchPage> {
+  double _height = 800;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         SizedBox(
-          height: 500,
+          height: _height,
           child: WaveWidget(
             config: CustomConfig(
               colors: [
-                Colors.blue.shade200,
-                Colors.blue.shade300,
-                Colors.blue.shade400,
-                Colors.blue.shade500,
+                Colors.green.shade200,
+                Colors.green.shade300,
+                Colors.green.shade400,
+                Colors.green.shade500,
               ],
               durations: [12000, 8000, 6000, 4800],
               heightPercentages: [
