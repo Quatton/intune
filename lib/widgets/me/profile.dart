@@ -50,7 +50,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           CircleAvatar(
                             radius: 48,
                             foregroundImage: NetworkImage(snapshot
-                                    .data!.images?[0].url ??
+                                    .data?.images![0].url ??
                                 'https://api.dicebear.com/5.x/bottts/png?seed=${_auth.currentUser!.id}'),
                           ),
                           const SizedBox(height: 24),
@@ -70,7 +70,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                                     const SplashRoute(),
                                     predicate: (route) => false);
                               },
-                              child: const Text("Logout")),
+                              child: const Text("Logout"))
                         ]),
                   );
                 })));

@@ -23,8 +23,11 @@ class SpotifyClient {
     'user-read-currently-playing',
   ].join(",");
 
-  static SpotifyApi get spotify =>
-      SpotifyApi.withAccessToken(_auth.currentSession!.providerToken!);
+  static final _credentials = SpotifyApiCredentials(_clientId, _clientSecret);
+
+  static SpotifyApi get spotify => _auth.currentSession!.providerToken != null
+      ? SpotifyApi.withAccessToken(_auth.currentSession!.providerToken!)
+      : SpotifyApi(_credentials);
 
   static Future<void> connectToSpotifyRemote() async {
     final accessToken = await getAccessToken();
