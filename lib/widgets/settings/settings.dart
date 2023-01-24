@@ -1,10 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intune/widgets/settings/profile_settings.dart';
 
 import 'header.dart';
-
-final _auth = FirebaseAuth.instance;
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});

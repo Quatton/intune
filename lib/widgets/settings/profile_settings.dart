@@ -1,11 +1,9 @@
-import 'package:auto_route/annotations.dart';
 import 'package:auto_route/auto_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
-import 'package:intune/widgets/splash.dart';
 
-final _auth = FirebaseAuth.instance;
+final _auth = supabase.auth;
 
 class ProfileSettings extends StatefulWidget {
   const ProfileSettings({
@@ -44,18 +42,18 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                     CircleAvatar(
                       radius: 48,
                       foregroundImage: NetworkImage(
-                          'https://api.dicebear.com/5.x/bottts/png?seed=${_auth.currentUser!.uid}'),
+                          'https://api.dicebear.com/5.x/bottts/png?seed=${_auth.currentUser!.id}'),
                     ),
                     const SizedBox(height: 24),
                     // create a table
-                    Text(_auth.currentUser!.displayName ?? '',
+                    Text(_auth.currentUser!.aud,
                         style: Theme.of(context).textTheme.headline6),
                     const SizedBox(height: 24),
                     // logout button
                     ElevatedButton(
                         onPressed: () async {
                           await _auth.signOut();
-                          context.router.pushAndPopUntil(SplashRoute(),
+                          context.router.pushAndPopUntil(const SplashRoute(),
                               predicate: (route) => false);
                         },
                         child: const Text("Logout")),

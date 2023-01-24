@@ -23,11 +23,11 @@
 	<key>CFBundleURLTypes</key>
   <array>
     <dict>
-      <key>CFBundleURLName</key>
-      <string>com.quattonary.intune</string>
+      <key>CFBundleTypeRole</key>
+      <string>Editor</string>
       <key>CFBundleURLSchemes</key>
       <array>
-        <string>com.quattonary.intune://login-callback</string>
+        <string>com.quattonary.intune</string>
       </array>
     </dict>
   </array>

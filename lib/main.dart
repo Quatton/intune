@@ -2,18 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:intune/routes/guard.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'firebase_options.dart';
 
 //import google fonts
 import 'package:google_fonts/google_fonts.dart';
 
 import 'routes/router.gr.dart';
-
-const supabaseUrl = 'https://kluwpuvykzdkssrohewj.supabase.co';
-const supabaseKey = String.fromEnvironment('SUPABASE_KEY');
 
 Future main() async {
   await dotenv.load(fileName: ".env");
@@ -21,11 +16,9 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // We're using the manual installation on non-web platforms since Google sign in plugin doesn't yet support Dart initialization.
   // See related issue: https://github.com/flutter/flutter/issues/96391
+  const supabaseUrl = 'https://kluwpuvykzdkssrohewj.supabase.co';
+  final supabaseKey = dotenv.get('SUPABASE_KEY');
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseKey);
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   runApp(Intune());
 }

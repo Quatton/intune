@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
 
 import 'common/banner.dart';
@@ -12,6 +13,26 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  bool _redirectCalled = false;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _redirect();
+  }
+
+  Future<void> _redirect() async {
+    await Future.delayed(Duration.zero);
+    if (_redirectCalled || !mounted) {
+      return;
+    }
+
+    _redirectCalled = true;
+    final session = supabase.auth.currentSession;
+    if (session != null) {
+      context.router.replace(const HomeRoute());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +58,7 @@ class _SplashPageState extends State<SplashPage> {
 
                   // login button that will push to login route
                   SizedBox(
-                    height: 50,
+                    height: 60,
                     width: 200,
                     child: ElevatedButton(
                       onPressed: () {
@@ -49,14 +70,8 @@ class _SplashPageState extends State<SplashPage> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                       ),
-                      child: const Text(
-                        'Get Started',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      child: Text('Get Started',
+                          style: Theme.of(context).textTheme.bodyText1),
                     ),
                   ),
                 ])));
