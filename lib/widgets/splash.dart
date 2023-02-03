@@ -30,10 +30,6 @@ class _SplashPageState extends State<SplashPage> {
     _redirectCalled = true;
     final session = supabase.auth.currentSession;
     if (session != null) {
-      // if providerToken is null getAccessToken
-      if (session.providerToken == null) {
-        await SpotifyClient.getAccessToken();
-      }
       context.router.replace(const HomeRoute());
     }
   }

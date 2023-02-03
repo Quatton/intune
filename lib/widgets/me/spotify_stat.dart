@@ -43,7 +43,7 @@ class _SpotifyStatState extends State<SpotifyStat> {
             width: MediaQuery.of(context).size.width * 0.95,
             child: Table(
               defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              columnWidths: {
+              columnWidths: const {
                 0: FixedColumnWidth(50),
                 1: FixedColumnWidth(
                     SpotifyStat._imageSize + SpotifyStat._padding * 2),
@@ -66,17 +66,22 @@ class _SpotifyStatState extends State<SpotifyStat> {
                           height: SpotifyStat._imageSize),
                     )
                   else
-                    Container(
-                      width: SpotifyStat._imageSize,
-                      height: SpotifyStat._imageSize,
-                      color: Colors.grey.shade800,
+                    Padding(
+                      padding: const EdgeInsets.all(SpotifyStat._padding),
+                      child: Container(
+                        width: SpotifyStat._imageSize,
+                        height: SpotifyStat._imageSize,
+                        color: Colors.grey.shade800,
+                      ),
                     ),
                   if (artist?.name != null)
                     Padding(
                       padding: const EdgeInsets.all(24.0),
                       child: Text(artist!.name!,
                           style: Theme.of(context).textTheme.bodyLarge),
-                    ),
+                    )
+                  else
+                    const SizedBox(),
                 ]);
               }).toList(),
             ),

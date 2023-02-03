@@ -59,7 +59,7 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                             Text("${snapshot.data!.displayName}",
                                 style: Theme.of(context).textTheme.headline6)
                           else
-                            const Text("Error Loading User"),
+                            const Text("You're not connected to Spotify!"),
 
                           const SizedBox(height: 24),
                           // logout button
@@ -75,10 +75,9 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           else
                             ElevatedButton(
                                 onPressed: () async {
-                                  await SpotifyClient.getAccessToken();
                                   setState(() {});
                                 },
-                                child: const Text("Tap to retry"))
+                                child: const Text("Connect to Spotify"))
                         ]),
                   );
                 })));

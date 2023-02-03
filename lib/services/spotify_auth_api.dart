@@ -25,7 +25,7 @@ class SpotifyClient {
     'user-read-playback-position',
     'user-top-read',
     'user-read-recently-played',
-  ].join(",");
+  ];
 
   static String? accessToken;
   static final _credentials = SpotifyApiCredentials(_clientId, _clientSecret);
@@ -37,17 +37,19 @@ class SpotifyClient {
           : SpotifyApi(_credentials);
 
   static Future<void> connectToSpotifyRemote() async {
-    final accessToken = await getAccessToken();
+    final accessToken = await _getAccessToken();
     await SpotifySdk.connectToSpotifyRemote(
         clientId: dotenv.get("SPOTIFY_CLIENT_ID"),
         redirectUrl: dotenv.get("SPOTIFY_REDIRECT_URI"),
         accessToken: accessToken);
   }
 
-  static Future<String> getAccessToken() async {
+  static Future<String> _getAccessToken() async {
     try {
       var authenticationToken = await SpotifySdk.getAccessToken(
-          clientId: _clientId, redirectUrl: _redirectUrl, scope: scopes);
+          clientId: _clientId,
+          redirectUrl: _redirectUrl,
+          scope: scopes.join(', '));
       Log.setStatus('Got a token: $authenticationToken');
       SpotifyClient.accessToken = authenticationToken;
       return authenticationToken;

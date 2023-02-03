@@ -60,6 +60,8 @@ dev_dependencies:
 
   auto_route_generator: ^5.0.3
   build_runner: ^2.3.3
+  freezed: ^2.3.2
+  json_serializable: ^6.6.0
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -101,3 +103,8 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+prisma:
+  schema: prisma/schema.prisma # Path to your Prisma schema
+  production: lib/prisma_configurator.dart # Path to your production configurator
+  development: prisma/development.dart # Path to your development configurator
