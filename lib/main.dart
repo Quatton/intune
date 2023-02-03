@@ -36,21 +36,27 @@ class Intune extends StatelessWidget {
       title: 'Intune',
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(useMaterial3: true).copyWith(
-          brightness: Brightness.dark,
-          textTheme: GoogleFonts.montserratTextTheme(const TextTheme(
-            headline1: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-            headline2: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-            headline3: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            bodyText1: TextStyle(fontSize: 18),
-          )),
-          // default button theme to be circular border
-          buttonTheme: const ButtonThemeData(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(30)),
-            ),
+        brightness: Brightness.dark,
+        textTheme: GoogleFonts.montserratTextTheme(const TextTheme(
+          headline1: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+          headline2: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          headline3: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          bodyText1: TextStyle(fontSize: 18),
+        )),
+        // default button theme to be circular border
+        buttonTheme: const ButtonThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(30)),
           ),
-          cardColor: Colors.grey[800],
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.green)),
+        ),
+
+        cardColor: Colors.grey[800],
+        colorScheme: ColorScheme.dark().copyWith(
+            primary: Color.fromRGBO(18, 215, 97, 1),
+            secondary: Color.fromRGBO(243, 255, 72, 1),
+            tertiary: Color.fromRGBO(107, 0, 186, 1)),
+        appBarTheme: const AppBarTheme(toolbarHeight: 72.0),
+      ),
       routerDelegate: _appRouter.delegate(),
       routeInformationParser: _appRouter.defaultRouteParser(),
     );

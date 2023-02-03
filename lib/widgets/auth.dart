@@ -4,9 +4,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
 import 'package:intune/services/spotify_auth_api.dart';
+import 'package:intune/util/logger.dart';
 import 'package:intune/widgets/common/banner.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -242,9 +244,18 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
     try {
-      await supabase.auth.signInWithOAuth(Provider.spotify,
-          scopes: SpotifyClient.scopes.join(', '),
-          redirectTo: !kIsWeb ? dotenv.get("SPOTIFY_REDIRECT_URI") : null);
+      final client = GoTrueClient(
+          url: supabase.authUrl, headers: {"apiKey": supabase.supabaseKey});
+      final response = await client.getOAuthSignInUrl(
+          provider: Provider.spotify,
+          redirectTo: !kIsWeb ? dotenv.get("SPOTIFY_REDIRECT_URI") : null,
+          scopes: SpotifyClient.scopes.join(', '));
+      final result = await FlutterWebAuth2.authenticate(
+          url: response.url.toString(),
+          callbackUrlScheme: "com.quattonary.intune");
+      final tknResp = await client.getSessionFromUrl(Uri.parse(result));
+      await supabase.auth.setSession(tknResp.session.refreshToken!);
+      Log.setStatus(supabase.auth.currentUser?.id ?? "you're a disappointment");
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {

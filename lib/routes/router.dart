@@ -6,6 +6,7 @@ import 'package:intune/routes/guard.dart';
 import 'package:intune/widgets/auth.dart';
 import 'package:intune/widgets/home.dart';
 import 'package:intune/widgets/splash.dart';
+import 'package:intune/widgets/webview.dart';
 
 @MaterialAutoRouter(
   replaceInRouteName: 'Page,Route',
@@ -14,6 +15,7 @@ import 'package:intune/widgets/splash.dart';
     // MaterialRoute page and initial set to true
     AutoRoute(page: SplashPage, path: '/', initial: true),
     AutoRoute(page: LoginPage, path: '/login'),
+    AutoRoute(page: WebViewPage, path: '/webview'),
     AutoRoute(page: HomePage, path: '/home', guards: [AuthGuard])
   ],
 )

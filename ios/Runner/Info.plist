@@ -33,7 +33,6 @@
   </array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	
   <key>LSApplicationQueriesSchemes</key>
   <array>
     <string>spotify</string>

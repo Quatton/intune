@@ -1,4 +1,7 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:intune/constants/supabase.dart';
+import 'package:intune/routes/router.gr.dart';
 
 import 'header.dart';
 import 'profile.dart';
@@ -9,9 +12,25 @@ class MePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [SettingsHeader(), ProfileSettings(), SpotifyStat()],
+    return Scaffold(
+      appBar: AppBar(title: const Text('Me'),
+
+          // insert actions that include logout icon
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.logout_rounded),
+              tooltip: 'Logout',
+              onPressed: () {
+                supabase.auth.signOut();
+                context.router.pushAndPopUntil(const SplashRoute(),
+                    predicate: (route) => false);
+              },
+            ),
+          ]),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [ProfileSettings(), SpotifyStat()],
+        ),
       ),
     );
   }

@@ -1,11 +1,19 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/util/logger.dart';
+import 'package:oauth2_client/access_token_response.dart';
+import 'package:oauth2_client/oauth2_client.dart';
+import 'package:oauth2_client/oauth2_helper.dart';
+import 'package:oauth2_client/spotify_oauth2_client.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
+import 'package:oauth2/src/client.dart';
+import 'package:oauth2/src/credentials.dart';
 
 final _auth = supabase.auth;
 
@@ -27,14 +35,18 @@ class SpotifyClient {
     'user-read-recently-played',
   ];
 
-  static String? accessToken;
   static final _credentials = SpotifyApiCredentials(_clientId, _clientSecret);
+  static SpotifyApi spotify = SpotifyApi(_credentials);
 
-  static SpotifyApi get spotify => accessToken != null
-      ? SpotifyApi.withAccessToken(accessToken!)
-      : _auth.currentSession!.providerToken != null
-          ? SpotifyApi.withAccessToken(_auth.currentSession!.providerToken!)
-          : SpotifyApi(_credentials);
+  static final _client = SpotifyOAuth2Client(
+      redirectUri: _redirectUrl, customUriScheme: "com.quattonary.intune");
+  static final helper = OAuth2Helper(
+    _client,
+    grantType: OAuth2Helper.authorizationCode,
+    clientId: _clientId,
+    enablePKCE: true,
+    scopes: scopes,
+  );
 
   static Future<void> connectToSpotifyRemote() async {
     final accessToken = await _getAccessToken();
@@ -51,7 +63,6 @@ class SpotifyClient {
           redirectUrl: _redirectUrl,
           scope: scopes.join(', '));
       Log.setStatus('Got a token: $authenticationToken');
-      SpotifyClient.accessToken = authenticationToken;
       return authenticationToken;
     } on PlatformException catch (e) {
       Log.setStatus(e.code, message: e.message);
@@ -60,5 +71,29 @@ class SpotifyClient {
       Log.setStatus('not implemented');
       return Future.error('not implemented');
     }
+  }
+
+  static Future<AccessTokenResponse> getAccessToken(
+      BuildContext context) async {
+    // final grant = SpotifyApi.authorizationCodeGrant(_credentials);
+
+    // final authUri = grant.getAuthorizationUrl(
+    //   Uri.parse(_redirectUrl),
+    //   scopes: scopes, // scopes are optional
+    // );
+
+    // AutoRouter.of(context).push(WebViewRoute(launchUrl: authUri));
+
+    final response = await _client.getTokenWithAuthCodeFlow(
+        enablePKCE: true, clientId: _clientId, scopes: scopes);
+
+    spotify = SpotifyApi(SpotifyApiCredentials(_clientId, _clientSecret,
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken,
+        expiration: response.expirationDate,
+        scopes: scopes));
+    final creds = await spotify.getCredentials();
+    Log.setStatus(creds.canRefresh.toString());
+    return response;
   }
 }

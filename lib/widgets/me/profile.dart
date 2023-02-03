@@ -75,6 +75,8 @@ class _ProfileSettingsState extends State<ProfileSettings> {
                           else
                             ElevatedButton(
                                 onPressed: () async {
+                                  await SpotifyClient.getAccessToken(context);
+
                                   setState(() {});
                                 },
                                 child: const Text("Connect to Spotify"))
