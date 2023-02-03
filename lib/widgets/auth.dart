@@ -8,8 +8,10 @@ import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
 import 'package:intune/services/spotify_auth_api.dart';
+import 'package:intune/services/supabase/supabase_helper.dart';
 import 'package:intune/util/logger.dart';
 import 'package:intune/widgets/common/banner.dart';
+import 'package:spotify/spotify.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ScaffoldSnackbar {
@@ -251,16 +253,44 @@ class _LoginPageState extends State<LoginPage> {
           redirectTo: !kIsWeb ? dotenv.get("SPOTIFY_REDIRECT_URI") : null,
           scopes: SpotifyClient.scopes.join(', '));
       final result = await FlutterWebAuth2.authenticate(
+          preferEphemeral: true,
           url: response.url.toString(),
           callbackUrlScheme: "com.quattonary.intune");
+      var url = Uri.parse(result);
+      if (url.hasQuery) {
+        final decoded = result.toString().replaceAll('#', '&');
+        url = Uri.parse(decoded);
+      } else {
+        final decoded = result.toString().replaceAll('#', '?');
+        url = Uri.parse(decoded);
+      }
+
+      // Spotify related
+      final accessToken = url.queryParameters['provider_token'];
+      final refreshToken = url.queryParameters['provider_refresh_token'];
+      final expiration = DateTime.now().add(const Duration(seconds: 3600));
+      final spotifyCredentials = SpotifyApiCredentials(
+          SpotifyClient.clientId, SpotifyClient.clientSecret,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+          expiration: expiration,
+          scopes: SpotifyClient.scopes);
       final tknResp = await client.getSessionFromUrl(Uri.parse(result));
+      SpotifyClient.saveCredentials(spotifyCredentials);
       await supabase.auth.setSession(tknResp.session.refreshToken!);
-      Log.setStatus(supabase.auth.currentUser?.id ?? "you're a disappointment");
+      await AuthHelper.updateSpotifyCredentials(
+        credentials: spotifyCredentials,
+      );
+      await DatabaseHelper.updateSpotifyLink(credentials: spotifyCredentials);
+    } on SupabaseHelperException catch (error) {
+      Log.setStatus(error.message);
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
+      setState(() {
+        _isLoading = false;
+      });
     } catch (error) {
       context.showErrorSnackBar(message: 'Unexpected error occurred');
-    } finally {
       setState(() {
         _isLoading = false;
       });
@@ -275,10 +305,7 @@ class _LoginPageState extends State<LoginPage> {
       if (formKey.currentState?.validate() ?? false) {
         await supabase.auth.signInWithOtp(
           email: _emailController.text,
-          emailRedirectTo: kIsWeb
-              ? null
-              : dotenv.get("SUPABASE_REDIRECT_URL",
-                  fallback: "com.quattonary.intune://login-callback"),
+          emailRedirectTo: kIsWeb ? null : dotenv.get("SUPABASE_REDIRECT_URL"),
         );
         if (mounted) {
           context.showSnackBar(message: 'Check your email for login link!');

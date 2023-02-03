@@ -3,6 +3,8 @@ import 'package:intune/services/spotify_auth_api.dart';
 import 'package:intune/util/logger.dart';
 import 'package:spotify/spotify.dart' hide Image;
 
+import '../../constants/supabase.dart';
+
 class SpotifyStat extends StatefulWidget {
   static const _padding = 16.0;
   static const _imageSize = 80.0;
@@ -26,6 +28,68 @@ class _SpotifyStatState extends State<SpotifyStat> {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                //use two shades of gray
+                Colors.green.shade500,
+                Colors.grey.shade800,
+              ],
+            ),
+          ),
+          child: SizedBox(
+              height: 300,
+              width: double.infinity,
+              child: FutureBuilder<User>(
+                  future: SpotifyClient.spotify.me.get(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // profile picture from 'https://api.dicebear.com/5.x/bottts/png?seed=${_auth.currentUser!.uid}' mask with white circle
+                            CircleAvatar(
+                              radius: 48,
+                              foregroundImage: NetworkImage(snapshot
+                                      .data?.images![0].url ??
+                                  'https://api.dicebear.com/5.x/bottts/png?seed=${supabase.auth.currentUser!.id}'),
+                            ),
+                            const SizedBox(height: 24),
+                            // create a table
+                            if (snapshot.hasData)
+                              Text("${snapshot.data!.displayName}",
+                                  style: Theme.of(context).textTheme.headline6)
+                            else
+                              const Text("You're not connected to Spotify!"),
+
+                            const SizedBox(height: 24),
+                            // logout button
+                            if (snapshot.hasData)
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    await SpotifyClient.disconnect();
+                                    setState(() {});
+                                  },
+                                  child: const Text("Disconnect"))
+                            else
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    await SpotifyClient.getAccessToken();
+
+                                    setState(() {});
+                                  },
+                                  child: const Text("Connect to Spotify"))
+                          ]),
+                    );
+                  }))),
       Padding(
         padding: const EdgeInsets.all(24.0),
         child: Text("My Top Artists",

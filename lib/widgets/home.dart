@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intune/services/spotify_auth_api.dart';
+import 'package:intune/services/supabase/supabase_helper.dart';
+import 'package:intune/util/logger.dart';
 
 import 'package:intune/widgets/friends.dart';
 import 'package:intune/widgets/match.dart';
@@ -18,6 +21,18 @@ class _HomePageState extends State<HomePage> {
     const MatchPage(),
     const MePage(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    try {
+      final credentials = AuthHelper.getSpotifyCredentials();
+      if (credentials != null) SpotifyClient.saveCredentials(credentials);
+    } on SupabaseHelperException catch (e) {
+      Log.setStatus("Error: ${e.message} Hehe");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

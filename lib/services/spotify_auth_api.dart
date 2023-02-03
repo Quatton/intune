@@ -1,26 +1,21 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intune/constants/supabase.dart';
+import 'package:intune/services/supabase/supabase_helper.dart';
 import 'package:intune/util/logger.dart';
-import 'package:oauth2_client/access_token_response.dart';
-import 'package:oauth2_client/oauth2_client.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 import 'package:oauth2_client/spotify_oauth2_client.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
-import 'package:oauth2/src/client.dart';
-import 'package:oauth2/src/credentials.dart';
 
 final _auth = supabase.auth;
 
 class SpotifyClient {
-  static final _clientId = dotenv.get("SPOTIFY_CLIENT_ID");
-  static final _clientSecret = dotenv.get("SPOTIFY_CLIENT_SECRET");
-  static final _redirectUrl = dotenv.get("SPOTIFY_REDIRECT_URI");
+  static final clientId = dotenv.get("SPOTIFY_CLIENT_ID");
+  static final clientSecret = dotenv.get("SPOTIFY_CLIENT_SECRET");
+  static final redirectUrl = dotenv.get("SPOTIFY_REDIRECT_URI");
   static final _apiRoute = "https://api.spotify.com/v1/";
   static final scopes = [
     'user-read-private',
@@ -35,21 +30,28 @@ class SpotifyClient {
     'user-read-recently-played',
   ];
 
-  static final _credentials = SpotifyApiCredentials(_clientId, _clientSecret);
-  static SpotifyApi spotify = SpotifyApi(_credentials);
+  static SpotifyApiCredentials credentials =
+      SpotifyApiCredentials(clientId, clientSecret);
+  static SpotifyApi _spotify = SpotifyApi(credentials);
+
+  static SpotifyApi get spotify {
+    return SpotifyApi(credentials);
+  }
 
   static final _client = SpotifyOAuth2Client(
-      redirectUri: _redirectUrl, customUriScheme: "com.quattonary.intune");
+      redirectUri: redirectUrl, customUriScheme: "com.quattonary.intune");
   static final helper = OAuth2Helper(
     _client,
     grantType: OAuth2Helper.authorizationCode,
-    clientId: _clientId,
+    clientId: clientId,
     enablePKCE: true,
     scopes: scopes,
   );
 
   static Future<void> connectToSpotifyRemote() async {
-    final accessToken = await _getAccessToken();
+    final credentials = await spotify.getCredentials();
+    final accessToken = credentials.accessToken ?? await getAccessToken();
+    if (accessToken == null) throw Exception("No access token found");
     await SpotifySdk.connectToSpotifyRemote(
         clientId: dotenv.get("SPOTIFY_CLIENT_ID"),
         redirectUrl: dotenv.get("SPOTIFY_REDIRECT_URI"),
@@ -59,8 +61,8 @@ class SpotifyClient {
   static Future<String> _getAccessToken() async {
     try {
       var authenticationToken = await SpotifySdk.getAccessToken(
-          clientId: _clientId,
-          redirectUrl: _redirectUrl,
+          clientId: clientId,
+          redirectUrl: redirectUrl,
           scope: scopes.join(', '));
       Log.setStatus('Got a token: $authenticationToken');
       return authenticationToken;
@@ -73,8 +75,7 @@ class SpotifyClient {
     }
   }
 
-  static Future<AccessTokenResponse> getAccessToken(
-      BuildContext context) async {
+  static Future<String?> getAccessToken() async {
     // final grant = SpotifyApi.authorizationCodeGrant(_credentials);
 
     // final authUri = grant.getAuthorizationUrl(
@@ -85,15 +86,40 @@ class SpotifyClient {
     // AutoRouter.of(context).push(WebViewRoute(launchUrl: authUri));
 
     final response = await _client.getTokenWithAuthCodeFlow(
-        enablePKCE: true, clientId: _clientId, scopes: scopes);
+        webAuthOpts: {'preferEphemeral': true},
+        enablePKCE: true,
+        clientId: clientId,
+        scopes: scopes);
 
-    spotify = SpotifyApi(SpotifyApiCredentials(_clientId, _clientSecret,
+    final credentials = SpotifyApiCredentials(clientId, clientSecret,
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
         expiration: response.expirationDate,
-        scopes: scopes));
+        scopes: scopes);
+
+    saveCredentials(credentials);
+    return response.accessToken;
+  }
+
+  static Future<void> saveCredentials(
+      SpotifyApiCredentials newCredentials) async {
+    credentials = newCredentials;
     final creds = await spotify.getCredentials();
     Log.setStatus(creds.canRefresh.toString());
-    return response;
+  }
+
+  static Future<void> refreshCredentials() async {
+    if (credentials.expiration != null &&
+        DateTime.now().isBefore(credentials.expiration!)) return;
+    final creds = await spotify.getCredentials();
+    await saveCredentials(creds);
+  }
+
+  static Future<void> disconnect() async {
+    credentials = SpotifyApiCredentials(clientId, clientSecret);
+    AuthHelper.deleteSpotifyCredentials();
+    DatabaseHelper.deleteSpotifyLink();
+    final creds = await spotify.getCredentials();
+    Log.setStatus(creds.canRefresh.toString());
   }
 }
