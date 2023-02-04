@@ -1,11 +1,6 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:intune/constants/supabase.dart';
-import 'package:intune/routes/router.gr.dart';
-import 'package:intune/services/spotify_api.dart';
+import 'package:intune/screens/me/top_artists.dart';
 
-import 'header.dart';
-import 'profile.dart';
 import 'profile.dart';
 
 class MePage extends StatelessWidget {
@@ -17,7 +12,7 @@ class MePage extends StatelessWidget {
       appBar: AppBar(title: const Text('Me')),
       body: SingleChildScrollView(
         child: Column(
-          children: [Profile()],
+          children: [Profile(), TopArtists()],
         ),
       ),
     );

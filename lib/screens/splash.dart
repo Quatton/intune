@@ -58,23 +58,25 @@ class _SplashPageState extends State<SplashPage> {
                   const LogoBanner(),
 
                   // login button that will push to login route
-                  SizedBox(
-                    height: 60,
-                    width: 200,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        context.router.replaceNamed('/login');
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade500,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                      ),
-                      child: Text('Get Started',
-                          style: Theme.of(context).textTheme.bodyText1),
-                    ),
-                  ),
+                  !_redirectCalled
+                      ? SizedBox(
+                          height: 60,
+                          width: 200,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.router.replaceNamed('/login');
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade500,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                            ),
+                            child: Text('Get Started',
+                                style: Theme.of(context).textTheme.bodyText1),
+                          ),
+                        )
+                      : Container(),
                 ])));
   }
 }

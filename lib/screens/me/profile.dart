@@ -45,7 +45,7 @@ class _ProfileState extends State<Profile> {
                     try {
                       profileUrl = snapshot.data!.images![0].url!;
                     } catch (e) {
-                      Log.setStatus(e.toString());
+                      Log.setStatus("No profile will use robots");
                       profileUrl =
                           'https://api.dicebear.com/5.x/bottts/png?seed=${supabase.auth.currentUser!.id}';
                     }
