@@ -1,23 +1,12 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
 import 'package:intune/services/spotify_api.dart';
 import 'package:intune/util/logger.dart';
 import 'package:spotify/spotify.dart' hide Image;
 
-import '../../constants/supabase.dart';
-
 class Profile extends StatefulWidget {
-  static const _padding = 16.0;
-  static const _imageSize = 80.0;
-  static const _dividerHeight = 2.0;
-  static final _rowHeight = _imageSize + _padding * 2;
-  static final _topArtistCount = 5;
-  static final _topTrackCount = 5;
-  static final _containerHeight = _rowHeight * _topArtistCount +
-      _dividerHeight * (_topArtistCount - 1) +
-      _padding * 2;
-
   const Profile({
     Key? key,
   }) : super(key: key);
@@ -103,72 +92,6 @@ class _ProfileState extends State<Profile> {
                           ]),
                     );
                   }))),
-      Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Text("My Top Artists",
-            style: Theme.of(context).textTheme.headline5),
-      ),
-      FutureBuilder<Iterable<Artist>>(
-        future: SpotifyClient.spotify.me
-            .topArtists(Profile._topArtistCount, 0, 'medium_term'),
-        builder: (BuildContext context, snapshot) {
-          if (snapshot.hasError) {
-            Log.setStatus('Error: ${snapshot.error}');
-          }
-
-          return SizedBox(
-            width: MediaQuery.of(context).size.width * 0.95,
-            child: Table(
-              defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-              columnWidths: const {
-                0: FixedColumnWidth(50),
-                1: FixedColumnWidth(Profile._imageSize + Profile._padding * 2),
-                2: FlexColumnWidth(),
-              },
-              children: List<int>.generate(
-                      Profile._topArtistCount, (int index) => index)
-                  .map((int index) {
-                Artist? artist;
-                try {
-                  artist = snapshot.data?.elementAt(index);
-                } catch (e) {
-                  artist = null;
-                }
-                return TableRow(children: [
-                  Center(
-                    child: Text("${index + 1}",
-                        style: Theme.of(context).textTheme.headline2),
-                  ),
-                  if (artist?.images?[0].url != null)
-                    Padding(
-                      padding: const EdgeInsets.all(Profile._padding),
-                      child: Image.network(artist!.images![0].url!,
-                          width: Profile._imageSize,
-                          height: Profile._imageSize),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.all(Profile._padding),
-                      child: Container(
-                        width: Profile._imageSize,
-                        height: Profile._imageSize,
-                        color: Colors.grey.shade800,
-                      ),
-                    ),
-                  if (artist?.name != null)
-                    Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Text(artist!.name!,
-                          style: Theme.of(context).textTheme.bodyLarge),
-                    )
-                  else
-                    const SizedBox(),
-                ]);
-              }).toList(),
-            ),
-          );
-        },
-      ),
     ]);
   }
 }

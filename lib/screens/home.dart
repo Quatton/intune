@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:intune/widgets/friends.dart';
-import 'package:intune/widgets/match.dart';
-import 'package:intune/widgets/me/me.dart';
+import 'package:intune/screens/friends.dart';
+import 'package:intune/screens/match.dart';
+import 'package:intune/screens/me/me.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
