@@ -21,7 +21,7 @@ class AuthHelper {
 }
 
 extension SpotifyUser on User {
-  spotify.SpotifyApiCredentials? get credentials {
+  spotify.SpotifyApiCredentials get credentials {
     try {
       final credentials = _auth.currentUser!.userMetadata!;
       return spotify.SpotifyApiCredentials(

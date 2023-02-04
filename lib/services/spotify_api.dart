@@ -9,7 +9,6 @@ import 'package:oauth2_client/oauth2_helper.dart';
 import 'package:oauth2_client/spotify_oauth2_client.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
-import 'package:intune/services/supabase/supabase_helper.dart';
 
 final _auth = supabase.auth;
 
@@ -31,16 +30,13 @@ class SpotifyClient {
     'user-read-recently-played',
   ];
 
-  static final SpotifyApiCredentials _publicCredentials =
+  static final SpotifyApiCredentials publicCredentials =
       SpotifyApiCredentials(clientId, clientSecret);
 
-  static SpotifyApiCredentials? _privateCredentials;
-
-  static SpotifyApiCredentials get credentials =>
-      _privateCredentials ?? _publicCredentials;
-
+  static SpotifyApi _spotify = SpotifyApi(publicCredentials);
   static SpotifyApi get spotify {
-    return SpotifyApi(credentials);
+    syncTokenIfNeeded();
+    return SpotifyApi(_auth.currentUser!.credentials);
   }
 
   static final _client = SpotifyOAuth2Client(
@@ -100,13 +96,14 @@ class SpotifyClient {
   }
 
   static void saveCredentials(SpotifyApiCredentials newCredentials) {
-    _privateCredentials = newCredentials;
+    _spotify = SpotifyApi(newCredentials);
   }
 
-  static void loadCredentialsFromSupabase() {
-    final creds = supabase.auth.currentUser?.credentials;
-    if (creds != null) {
-      saveCredentials(creds);
+  static void syncTokenIfNeeded() async {
+    if (_auth.currentUser?.credentials.isExpired != null &&
+        _auth.currentUser!.credentials.isExpired) {
+      final credentials = await _spotify.getCredentials();
+      await AuthHelper.updateSpotifyCredentials(credentials: credentials);
     }
   }
 }

@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
-import 'package:intune/services/spotify_auth_api.dart';
+import 'package:intune/services/spotify_api.dart';
 import 'package:intune/services/supabase/supabase_helper.dart';
 import 'package:intune/util/logger.dart';
 import 'package:intune/widgets/common/banner.dart';
@@ -40,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     _authStateSubscription = supabase.auth.onAuthStateChange.listen((data) {
-      if (_redirecting) return;
+      if (_redirecting || _isLoading) return;
       final session = data.session;
       if (session != null) {
         _redirecting = true;
@@ -188,9 +188,6 @@ class _LoginPageState extends State<LoginPage> {
           expiration: expiration,
           scopes: SpotifyClient.scopes);
 
-      // Now our SpotifyClient can call endpoints!
-      SpotifyClient.saveCredentials(spotifyCredentials);
-
       // And finally load our session up because we can't update db w/o login
       await supabase.auth.getSessionFromUrl(Uri.parse(result));
 
@@ -204,13 +201,12 @@ class _LoginPageState extends State<LoginPage> {
     } on AuthException catch (error) {
       Log.setStatus(error.message);
       context.showErrorSnackBar(message: error.message);
-      setState(() {
-        _isLoading = false;
-      });
     } catch (error) {
       Log.setStatus(error.toString());
       context.showErrorSnackBar(message: 'Unexpected error occurred');
+    }
 
+    if (mounted) {
       setState(() {
         _isLoading = false;
       });

@@ -15,9 +15,9 @@ import 'package:auto_route/auto_route.dart' as _i5;
 import 'package:flutter/foundation.dart' as _i8;
 import 'package:flutter/material.dart' as _i6;
 
-import '../widgets/auth.dart' as _i2;
-import '../widgets/home.dart' as _i4;
-import '../widgets/splash.dart' as _i1;
+import '../screens/auth.dart' as _i2;
+import '../screens/home.dart' as _i4;
+import '../screens/splash.dart' as _i1;
 import '../widgets/webview.dart' as _i3;
 import 'guard.dart' as _i7;
 

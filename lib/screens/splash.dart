@@ -2,9 +2,9 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:intune/constants/supabase.dart';
 import 'package:intune/routes/router.gr.dart';
-import 'package:intune/services/spotify_auth_api.dart';
+import 'package:intune/services/spotify_api.dart';
 
-import 'common/banner.dart';
+import '../widgets/common/banner.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
