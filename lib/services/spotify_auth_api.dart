@@ -30,9 +30,13 @@ class SpotifyClient {
     'user-read-recently-played',
   ];
 
-  static SpotifyApiCredentials credentials =
+  static final SpotifyApiCredentials _publicCredentials =
       SpotifyApiCredentials(clientId, clientSecret);
-  static SpotifyApi _spotify = SpotifyApi(credentials);
+
+  static SpotifyApiCredentials? _privateCredentials;
+
+  static SpotifyApiCredentials get credentials =>
+      _privateCredentials ?? _publicCredentials;
 
   static SpotifyApi get spotify {
     return SpotifyApi(credentials);
@@ -58,6 +62,7 @@ class SpotifyClient {
         accessToken: accessToken);
   }
 
+  @Deprecated("Use public method [getAccessToken]")
   static Future<String> _getAccessToken() async {
     try {
       var authenticationToken = await SpotifySdk.getAccessToken(
@@ -76,15 +81,6 @@ class SpotifyClient {
   }
 
   static Future<String?> getAccessToken() async {
-    // final grant = SpotifyApi.authorizationCodeGrant(_credentials);
-
-    // final authUri = grant.getAuthorizationUrl(
-    //   Uri.parse(_redirectUrl),
-    //   scopes: scopes, // scopes are optional
-    // );
-
-    // AutoRouter.of(context).push(WebViewRoute(launchUrl: authUri));
-
     final response = await _client.getTokenWithAuthCodeFlow(
         webAuthOpts: {'preferEphemeral': true},
         enablePKCE: true,
@@ -98,28 +94,25 @@ class SpotifyClient {
         scopes: scopes);
 
     saveCredentials(credentials);
+    await DatabaseHelper.updateSpotifyLink(credentials: credentials);
     return response.accessToken;
   }
 
-  static Future<void> saveCredentials(
-      SpotifyApiCredentials newCredentials) async {
-    credentials = newCredentials;
-    final creds = await spotify.getCredentials();
-    Log.setStatus(creds.canRefresh.toString());
+  static void saveCredentials(SpotifyApiCredentials newCredentials) {
+    _privateCredentials = newCredentials;
   }
 
-  static Future<void> refreshCredentials() async {
-    if (credentials.expiration != null &&
-        DateTime.now().isBefore(credentials.expiration!)) return;
-    final creds = await spotify.getCredentials();
-    await saveCredentials(creds);
+  static void loadCredentialsFromSupabase() {
+    final creds = AuthHelper.getSpotifyCredentials();
+    if (creds != null) {
+      saveCredentials(creds);
+    }
   }
 
   static Future<void> disconnect() async {
-    credentials = SpotifyApiCredentials(clientId, clientSecret);
-    AuthHelper.deleteSpotifyCredentials();
-    DatabaseHelper.deleteSpotifyLink();
+    _privateCredentials = null;
+    await DatabaseHelper.deleteSpotifyLink();
     final creds = await spotify.getCredentials();
-    Log.setStatus(creds.canRefresh.toString());
+    Log.setStatus(creds.canRefresh ? "Can refresh" : "Not can refresh");
   }
 }

@@ -36,7 +36,9 @@ class AuthHelper {
       rethrow;
     } catch (error) {
       throw SupabaseHelperException(
-          "Unable to get userMetadata: ${_auth.currentUser?.userMetadata}");
+          """Able to get user metadata?: ${_auth.currentUser?.userMetadata != null}
+             ${_auth.currentUser?.userMetadata != null ? "But rather because ${error.toString()}" : ""}
+          """);
     }
   }
 

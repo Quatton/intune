@@ -246,16 +246,21 @@ class _LoginPageState extends State<LoginPage> {
       _isLoading = true;
     });
     try {
-      final client = GoTrueClient(
-          url: supabase.authUrl, headers: {"apiKey": supabase.supabaseKey});
-      final response = await client.getOAuthSignInUrl(
+      final response = await supabase.auth.getOAuthSignInUrl(
           provider: Provider.spotify,
           redirectTo: !kIsWeb ? dotenv.get("SPOTIFY_REDIRECT_URI") : null,
           scopes: SpotifyClient.scopes.join(', '));
+
+      // User login through the web
       final result = await FlutterWebAuth2.authenticate(
           preferEphemeral: true,
           url: response.url.toString(),
           callbackUrlScheme: "com.quattonary.intune");
+
+      // Now we have the result but if we get session first,
+      // The homepage might load without the accessToken
+
+      // Parse the result
       var url = Uri.parse(result);
       if (url.hasQuery) {
         final decoded = result.toString().replaceAll('#', '&');
@@ -265,32 +270,43 @@ class _LoginPageState extends State<LoginPage> {
         url = Uri.parse(decoded);
       }
 
-      // Spotify related
-      final accessToken = url.queryParameters['provider_token'];
-      final refreshToken = url.queryParameters['provider_refresh_token'];
-      final expiration = DateTime.now().add(const Duration(seconds: 3600));
+      // Retrieve two tokens and assume that it will expire in 3600 seconds
+      // It NEEDs to have these two or we just call error
+      final String accessToken = url.queryParameters['provider_token']!;
+      final String refreshToken =
+          url.queryParameters['provider_refresh_token']!;
+      final DateTime expiration =
+          DateTime.now().add(const Duration(seconds: 3600));
+
       final spotifyCredentials = SpotifyApiCredentials(
           SpotifyClient.clientId, SpotifyClient.clientSecret,
           accessToken: accessToken,
           refreshToken: refreshToken,
           expiration: expiration,
           scopes: SpotifyClient.scopes);
-      final tknResp = await client.getSessionFromUrl(Uri.parse(result));
+
+      // Now our SpotifyClient can call endpoints!
       SpotifyClient.saveCredentials(spotifyCredentials);
-      await supabase.auth.setSession(tknResp.session.refreshToken!);
-      await AuthHelper.updateSpotifyCredentials(
-        credentials: spotifyCredentials,
-      );
+
+      // And finally load our session up because we can't update db w/o login
+      await supabase.auth.getSessionFromUrl(Uri.parse(result));
+
+      // Save that onto our database
       await DatabaseHelper.updateSpotifyLink(credentials: spotifyCredentials);
+
+      // This should flow flawlessly.
     } on SupabaseHelperException catch (error) {
       Log.setStatus(error.message);
     } on AuthException catch (error) {
+      Log.setStatus(error.message);
       context.showErrorSnackBar(message: error.message);
       setState(() {
         _isLoading = false;
       });
     } catch (error) {
+      Log.setStatus(error.toString());
       context.showErrorSnackBar(message: 'Unexpected error occurred');
+
       setState(() {
         _isLoading = false;
       });
