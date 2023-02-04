@@ -26,8 +26,7 @@ class TopArtists extends StatelessWidget {
               style: Theme.of(context).textTheme.headline5),
         ),
         FutureBuilder<Iterable<Artist>>(
-          future: SpotifyClient.spotify.me
-              .topArtists(_topArtistCount, 0, 'medium_term'),
+          future: SpotifyClient.spotify.me.topArtists(),
           builder: (BuildContext context, snapshot) {
             if (snapshot.hasError) {
               Log.setStatus('TopArtists: ${snapshot.error}');
