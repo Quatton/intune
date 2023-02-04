@@ -49,6 +49,15 @@ class _SpotifyStatState extends State<SpotifyStat> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
+
+                    String profileUrl;
+                    try {
+                      profileUrl = snapshot.data!.images![0].url!;
+                    } on RangeError catch (e) {
+                      profileUrl =
+                          'https://api.dicebear.com/5.x/bottts/png?seed=${supabase.auth.currentUser!.id}';
+                    }
+
                     return Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -58,9 +67,7 @@ class _SpotifyStatState extends State<SpotifyStat> {
                             // profile picture from 'https://api.dicebear.com/5.x/bottts/png?seed=${_auth.currentUser!.uid}' mask with white circle
                             CircleAvatar(
                               radius: 48,
-                              foregroundImage: NetworkImage(snapshot
-                                      .data?.images![0].url ??
-                                  'https://api.dicebear.com/5.x/bottts/png?seed=${supabase.auth.currentUser!.id}'),
+                              foregroundImage: NetworkImage(profileUrl),
                             ),
                             const SizedBox(height: 24),
                             // create a table
@@ -116,7 +123,12 @@ class _SpotifyStatState extends State<SpotifyStat> {
               children: List<int>.generate(
                       SpotifyStat._topArtistCount, (int index) => index)
                   .map((int index) {
-                final artist = snapshot.data?.elementAt(index);
+                Artist? artist;
+                try {
+                  artist = snapshot.data?.elementAt(index);
+                } catch (e) {
+                  artist = null;
+                }
                 return TableRow(children: [
                   Center(
                     child: Text("${index + 1}",

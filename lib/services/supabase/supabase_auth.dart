@@ -21,9 +21,7 @@ class AuthHelper {
 
   static spotify.SpotifyApiCredentials? getSpotifyCredentials() {
     try {
-      final user = _auth.currentUser;
-      if (user == null) throw SupabaseHelperException("No user found");
-      final credentials = user.userMetadata!;
+      final credentials = _auth.currentUser!.userMetadata!;
       return spotify.SpotifyApiCredentials(
         dotenv.get("SPOTIFY_CLIENT_ID"),
         dotenv.get("SPOTIFY_CLIENT_SECRET"),
@@ -32,13 +30,11 @@ class AuthHelper {
         refreshToken: credentials['refreshToken'],
         expiration: DateTime.tryParse(credentials['expiration']),
       );
-    } on SupabaseHelperException {
-      rethrow;
-    } catch (error) {
-      throw SupabaseHelperException(
-          """Able to get user metadata?: ${_auth.currentUser?.userMetadata != null}
-             ${_auth.currentUser?.userMetadata != null ? "But rather because ${error.toString()}" : ""}
-          """);
+    } catch (e) {
+      return spotify.SpotifyApiCredentials(
+        dotenv.get("SPOTIFY_CLIENT_ID"),
+        dotenv.get("SPOTIFY_CLIENT_SECRET"),
+      );
     }
   }
 
