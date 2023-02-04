@@ -9,6 +9,7 @@ import 'package:oauth2_client/oauth2_helper.dart';
 import 'package:oauth2_client/spotify_oauth2_client.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
+import 'package:intune/services/supabase/supabase_helper.dart';
 
 final _auth = supabase.auth;
 
@@ -94,7 +95,7 @@ class SpotifyClient {
         scopes: scopes);
 
     saveCredentials(credentials);
-    await DatabaseHelper.updateSpotifyLink(credentials: credentials);
+    await AuthHelper.updateSpotifyCredentials(credentials: credentials);
     return response.accessToken;
   }
 
@@ -103,16 +104,9 @@ class SpotifyClient {
   }
 
   static void loadCredentialsFromSupabase() {
-    final creds = AuthHelper.getSpotifyCredentials();
+    final creds = supabase.auth.currentUser?.credentials;
     if (creds != null) {
       saveCredentials(creds);
     }
-  }
-
-  static Future<void> disconnect() async {
-    _privateCredentials = null;
-    await DatabaseHelper.deleteSpotifyLink();
-    final creds = await spotify.getCredentials();
-    Log.setStatus(creds.canRefresh ? "Can refresh" : "Not can refresh");
   }
 }

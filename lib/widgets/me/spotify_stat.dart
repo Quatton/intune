@@ -1,4 +1,6 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:intune/routes/router.gr.dart';
 import 'package:intune/services/spotify_auth_api.dart';
 import 'package:intune/util/logger.dart';
 import 'package:spotify/spotify.dart' hide Image;
@@ -82,8 +84,10 @@ class _SpotifyStatState extends State<SpotifyStat> {
                             if (snapshot.hasData)
                               ElevatedButton(
                                   onPressed: () async {
-                                    await SpotifyClient.disconnect();
-                                    setState(() {});
+                                    supabase.auth.signOut();
+                                    context.router.pushAndPopUntil(
+                                        const SplashRoute(),
+                                        predicate: (route) => false);
                                   },
                                   child: const Text("Disconnect"))
                             else

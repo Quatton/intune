@@ -9,9 +9,6 @@ class AuthGuard extends AutoRouteGuard {
     // the navigation is paused until resolver.next() is called with either
     // true to resume/continue navigation or false to abort navigation
     if (supabase.auth.currentUser != null) {
-      // if user is authenticated we continue
-
-      SpotifyClient.loadCredentialsFromSupabase();
       resolver.next(true);
     } else {
       // we redirect the user to our login page
